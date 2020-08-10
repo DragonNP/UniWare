@@ -1,6 +1,6 @@
 /*
   Sketch for the project "UniWare"
-  The source code on GitHub: 
+  The source code on GitHub: https://github.com/DragonNP/UniWare
   Author: DragonNP, 2020
   https://github.com/DragonNP/
 
@@ -14,7 +14,6 @@
   Adafruit_Sensor   -    https://github.com/adafruit/Adafruit_Sensor
   ESPAsyncTCP       -    https://github.com/me-no-dev/ESPAsyncTCP
   ESPAsyncWebServer -    https://github.com/me-no-dev/ESPAsyncWebServer
-  NTPClient         -    https://github.com/arduino-libraries/NTPClient
   ------------------------------------------------------
 */
 
@@ -37,9 +36,6 @@
 #include <Updater.h>
 // File System
 #include <FS.h>
-// NTP
-#include <WiFiUdp.h>
-#include <NTPClient.h>
 // ============== LIBS ==============
 
 // VARIABLES

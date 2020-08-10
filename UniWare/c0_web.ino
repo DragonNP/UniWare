@@ -57,10 +57,6 @@ void usePages() {
   HttpServer.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, "/mqtt.html", "text/html");
   });
-  // NTP
-  HttpServer.on("/ntp", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->send(SPIFFS, "/ntp.html", "text/html");
-  });
 }
 
 void WebStart() {

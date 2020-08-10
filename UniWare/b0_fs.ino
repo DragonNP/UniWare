@@ -30,9 +30,6 @@ bool loadSettings() {
   wifi_ssid = json["wifi"]["ssid"].as<String>();
   wifi_psswd = json["wifi"]["psswd"].as<String>();
   ap_psswd = json["wifi"]["passwdAP"].as<String>();
-  // NTP
-  ntp_server = json["ntp"]["server"].as<String>();
-  ntp_timezone = json["ntp"]["timezone"].as<String>();
 
   if (device_name == "") device_name = "UniWare_" + (WiFi.macAddress().substring(0, 5));   
   return true;
@@ -50,16 +47,11 @@ bool saveSettings() {
   wifi["ssid"] = wifi_ssid;
   wifi["psswd"] = wifi_psswd;
   wifi["psswdAP"] = ap_psswd;
-  
-  JsonObject& ntp = jsonBuffer.createObject();
-  ntp["server"] = ntp_server;
-  ntp["timezone"] = ntp_timezone;
 
   JsonObject& json = jsonBuffer.createObject();
   json["device"] = device;
   json["wifi"] = wifi;
-  json["ntp"] = ntp;
-
+  
   File configFile = SPIFFS.open("/settings.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
