@@ -118,35 +118,82 @@
 								<div class="pb-3">
 									<button type="button" class="btn btn-primary" onclick="save()">Save</button>
 								</div>
-								
-								<!-- Alerts -->								
-								<div class="alert alert-success alert-dismissible alert-success" id="form_device_success">
-									<strong>Saved!</strong> Device settings saved. <a class="alert-link" onclick="reboot()">Reboot?</a>
-									<button type="button" class="close" data-dismiss="alert">&times;</button>
-								</div>
-								<div class="alert alert-danger alert-dismissible alert-error" id="form_device_error">
-									<strong>Error!</strong> Submit the form failed.
-									<button type="button" class="close" data-dismiss="alert">&times;</button>
-								</div>
-
-								<div class="alert alert-success alert-dismissible alert-success" id="reboot_success">
-									<strong>Rebooting... Update page</strong>
-									<button type="button" class="close" data-dismiss="alert">&times;</button>
-								</div>
-								<div class="alert alert-danger alert-dismissible alert-error" id="reboot_error">
-									<strong>Error!</strong> Reboot device failed.
-									<button type="button" class="close" data-dismiss="alert">&times;</button>
-								</div>
 							</form>
 						</div>
 					</div>
                 </main>
+                <div style="position: relative; min-height: 200px;">
+                    <!-- Position it -->
+                    <div class="pt-2 pr-2" style="position: absolute; top: 0; right: 0;">
+                        <!-- Then put toasts within -->
+                        <div class="toast" id="load_error">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img">
+                                    <rect fill="#ff3232" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Error!</strong>
+                            </div>
+                            <div class="toast-body">
+                                 Load device settings failed.
+                            </div>
+                        </div>
+                        
+						<div class="toast" id="reboot_try">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                                    <rect fill="#32ff32" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Reboot</strong>
+                            </div>
+                            <div class="toast-body">
+                                Trying to reboot
+                            </div>
+                        </div>
+                        
+						<div class="toast" id="form_success">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                                    <rect fill="#32ff32" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Success!</strong>
+                            </div>
+                            <div class="toast-body">
+                                Device settings saved. <a class="alert-link" onclick="reboot()">Reboot?</a>
+                            </div>
+                        </div>
+
+                        <div class="toast" id="form_error">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img">
+                                    <rect fill="#ff3232" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Error!</strong>
+                            </div>
+                            <div class="toast-body">
+                                 Save device settings failed
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 		<script src="js/jquery.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
-		<!-- Load Title and inputs values -->
-		<script>
+        <!-- Utilities -->
+        <script type="text/javascript">
+            function showAlert(id) {
+                $("#" + id).fadeTo(3500, 500).slideUp(500, function(){
+					$("#" + id).slideUp(500);
+				});
+            }
+            function hideAlerts() {
+                $(".toast").hide();
+            }
+			
+            hideAlerts();
+        </script>
+		<!-- Loads -->
+		<script type="text/javascript">
 			function loadValues() {
 				var xhr = new XMLHttpRequest();
 				xhr.open("GET", "/api/device/get");
@@ -159,27 +206,24 @@
 						document.getElementById('device_name').value = json.name;
 					}
 				};
+				xhr.onerror = () => showAlert("load_error");
 				xhr.send();
 			}
 			
 			loadValues();
 		</script>
-		<!-- Alerts and send form -->
-		<script>
-			$('.alert').hide();
-			
+		<!-- Send form -->
+		<script type="text/javascript">			
 			function save() {
 				$.ajax({
 					type: "POST",
 					url: "/api/device/set",
 					data: JSON.stringify($("#device_form").serializeArray()),
 					success: function(msg){
-						$('.alert').hide();
-						$('#form_device_success').fadeIn(300);
+						showAlert('form_success');
 					},
 					error: function(){
-						$('.alert').hide();
-						$('#form_device_error').fadeIn(300);
+						showAlert('form_error');
 					}
 				});
 			}
@@ -187,15 +231,8 @@
 				$.ajax({
 					type: "POST",
 					url: "/api/device/reboot",
-					success: function(msg){
-						$('.alert').hide();
-						$('#reboot_success').fadeIn(300);
-					},
-					error: function(){
-						$('.alert').hide();
-						$('#reboot_error').fadeIn(300);
-					}
 				});
+				showAlert('reboot_try');
 			}
 		</script>
 	</body>
