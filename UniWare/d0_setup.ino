@@ -7,6 +7,7 @@ void setup() {
     return;
   }
 
+  setSensorsTypes();
   loadSettings();
   WiFiSetup();
   WebStart();

@@ -1,0 +1,406 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <title>UniWare</title>
+
+        <!-- Favicons -->
+        <link rel="shortcut icon" href="favicons/favicon.png" type="image/png" />
+        <link rel="shortcut icon" type="image/png" href="favicons/favicon.png" />
+
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet" />
+
+        <!-- Custom styles for this template -->
+        <link href="css/dashboard.min.css" rel="stylesheet" />
+    </head>
+    <body>
+        <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+            <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="/">UniWare</a>
+            <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Navigation -->
+                <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                    <div class="sidebar-sticky pt-3">
+                        <!-- General -->
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-muted">
+                            <span>General</span>
+                        </h6>
+                        <ul class="nav flex-column mb-2">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/device">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-phone" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M11 1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H5z" />
+                                        <path fill-rule="evenodd" d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+                                    </svg>
+                                    Device
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="/sensors">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-toggles" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M4.5 9a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7h-7zm7 6a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-7-14a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm2.45 0A3.49 3.49 0 0 1 8 3.5 3.49 3.49 0 0 1 6.95 6h4.55a2.5 2.5 0 0 0 0-5H6.95zM4.5 0h7a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7z"
+                                        />
+                                    </svg>
+                                    Sensors
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- Settings -->
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-muted">
+                            <span>Settings</span>
+                        </h6>
+                        <ul class="nav flex-column mb-2">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/wifi">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-wifi" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M15.385 6.115a.485.485 0 0 0-.048-.736A12.443 12.443 0 0 0 8 3 12.44 12.44 0 0 0 .663 5.379a.485.485 0 0 0-.048.736.518.518 0 0 0 .668.05A11.448 11.448 0 0 1 8 4c2.507 0 4.827.802 6.717 2.164.204.148.489.13.668-.049z"
+                                        />
+                                        <path
+                                            d="M13.229 8.271c.216-.216.194-.578-.063-.745A9.456 9.456 0 0 0 8 6c-1.905 0-3.68.56-5.166 1.526a.48.48 0 0 0-.063.745.525.525 0 0 0 .652.065A8.46 8.46 0 0 1 8 7a8.46 8.46 0 0 1 4.577 1.336c.205.132.48.108.652-.065zm-2.183 2.183c.226-.226.185-.605-.1-.75A6.472 6.472 0 0 0 8 9c-1.06 0-2.062.254-2.946.704-.285.145-.326.524-.1.75l.015.015c.16.16.408.19.611.09A5.478 5.478 0 0 1 8 10c.868 0 1.69.201 2.42.56.203.1.45.07.611-.091l.015-.015zM9.06 12.44c.196-.196.198-.52-.04-.66A1.99 1.99 0 0 0 8 11.5a1.99 1.99 0 0 0-1.02.28c-.238.14-.236.464-.04.66l.706.706a.5.5 0 0 0 .708 0l.707-.707z"
+                                        />
+                                    </svg>
+                                    WiFi
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/mqtt">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-hdd-network" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14 3H2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM2 2a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2z" />
+                                        <path d="M5 4.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-2 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" />
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M7.5 10V7h1v3a1.5 1.5 0 0 1 1.5 1.5h5.5a.5.5 0 0 1 0 1H10A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5H.5a.5.5 0 0 1 0-1H6A1.5 1.5 0 0 1 7.5 10zm0 1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"
+                                        />
+                                    </svg>
+                                    MQTT
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/ntp">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-clock" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm8-7A8 8 0 1 1 0 8a8 8 0 0 1 16 0z" />
+                                        <path fill-rule="evenodd" d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z" />
+                                    </svg>
+                                    NTP (time)
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- Page -->
+                <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                    <!-- Name -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Sensors</h1>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="row">
+                        <div class="col">
+                            <form class="form" id="form">
+                                <!-- Add sensor button -->
+                                <div class="pb-3">
+                                    <button type="button" id="add" class="btn btn-primary" onclick="AddNew()" disabled>
+                                        <svg width="1.3em" height="1.3em" viewBox="0 0 16 16" class="bi bi-plus-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4a.5.5 0 0 0-1 0v3.5H4a.5.5 0 0 0 0 1h3.5V12a.5.5 0 0 0 1 0V8.5H12a.5.5 0 0 0 0-1H8.5V4z" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Sensors -->
+                                <div class="row">
+                                    <div class="col-12 col-sm-10 col-md-10 col-lg-7 col-xl-6" id="sensors"></div>
+                                </div>
+
+                                <!-- Send button -->
+                                <div class="pb-3">
+                                    <button type="button" id="submit" class="btn btn-primary" onclick="save()" disabled>Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </main>
+                <div style="position: relative; min-height: 200px;">
+                    <!-- Position it -->
+                    <div class="pt-2 pr-2" style="position: absolute; top: 0; right: 0;">
+                        <!-- Then put toasts within -->
+                        <div class="toast" id="delete_sensor">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                                    <rect fill="#ff3232" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Error!</strong>
+                            </div>
+                            <div class="toast-body">
+                                Delete sensor failed
+                            </div>
+                        </div>
+						
+                        <div class="toast" id="load_sensors_error">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                                    <rect fill="#ff3232" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Error!</strong>
+                            </div>
+                            <div class="toast-body">
+                                Load sensors failed.
+                            </div>
+                        </div>
+
+                        <div class="toast" id="load_device_error">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img">
+                                    <rect fill="#ff3232" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Error!</strong>
+                            </div>
+                            <div class="toast-body">
+                                 Load device settings failed.
+                            </div>
+                        </div>
+                        
+						<div class="toast" id="reboot_try">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                                    <rect fill="#32ff32" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Reboot</strong>
+                            </div>
+                            <div class="toast-body">
+                                Trying to reboot
+                            </div>
+                        </div>
+                        
+						<div class="toast" id="form_success">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                                    <rect fill="#32ff32" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Success!</strong>
+                            </div>
+                            <div class="toast-body">
+                                Sensors senttings saved. <a class="alert-link" onclick="reboot()">Reboot?</a>
+                            </div>
+                        </div>
+
+                        <div class="toast" id="form_error">
+                            <div class="toast-header">
+                                <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img">
+                                    <rect fill="#ff3232" width="100%" height="100%"></rect>
+                                </svg>
+                                <strong class="mr-auto">Error!</strong>
+                            </div>
+                            <div class="toast-body">
+                                 Save sensors senttings failed
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <!-- Utilities -->
+        <script type="text/javascript">
+            function GenerateID(length) {
+                var result = "";
+                var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                var charactersLength = characters.length;
+
+                for (var i = 0; i < length; i++) {
+                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                }
+                return result;
+            }
+
+            function enable(id) {
+                document.getElementById(id).removeAttribute("disabled");
+            }
+
+            function showAlert(id) {
+                $("#" + id).fadeTo(3500, 500).slideUp(500, function(){
+					$("#" + id).slideUp(500);
+				});
+            }
+            function hideAlert(id) {
+                $("#" + id).hide();
+            }
+            function hideAlerts() {
+                $(".toast").hide();
+            }
+			
+            hideAlerts();
+        </script>
+        <!-- Logic adding card and show pins -->
+        <script type="text/javascript">
+            const type_pattern = '<option id="%id%_%short_name%" value="%short_name%">%name%</option>';
+            const pin_pattern =
+                '<div class="form-group input-group"><div class="input-group-prepend"><div class="input-group-text">%name%</div></div><input type="number" class="form-control" id="%id%_pin_%short_name%" name="%id%_pin_%short_name%" placeholder="%name% Pin" value="%value%" /></div>';
+            const default_sensor =
+                '<div class="sensor pb-3" id="%id%"><div class="card"><div class="card-header"><h5 class="card-title">Sensor</h5><div class="pl-3 pr-3 form-group row"><select class="form-control" name="%id%_type" id="%id%_type" onclick="showPins(\'%id%\')">%types%</select></div></div><div class="card-body"><h6 class="card-title">Pins</h6><div id="%id%_pins"></div><!-- Delete Sensor --><button type="button" class="btn btn-danger" id="%id%_delete" onclick="Delete(\'%id%\')"><svg width="1.3em" height="1.3em" viewBox="0 0 16 16" class="bi bi-dash-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4 7.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1H4z"/></svg></button></div></div>';
+
+            var sensors = {};
+            var types = {};
+
+            function CreateNewCard(id) {
+                var str = default_sensor;
+                var types_complete = "";
+
+                for (short_name in types) {
+                    types_complete += type_pattern;
+                    types_complete = types_complete.split("%short_name%").join(short_name);
+                    types_complete = types_complete.split("%name%").join(types[short_name].name);
+                    types_complete = types_complete.split("%id%").join(id);
+                }
+
+                str = str.split("%types%").join(types_complete);
+                str = str.split("%id%").join(id);
+                return str;
+            }
+
+            function AddNew() {
+                var sensors_div = document.getElementById("sensors");
+
+                sensors_div.innerHTML += CreateNewCard(GenerateID(5));
+            }
+
+            function Delete(id) {
+                if (sensors[id] == undefined) {
+                    document.getElementById(id).remove();
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/sensors/delete",
+                    data: '{"id":"%id%"}'.replace("%id%", id),
+                    success: function (msg) {
+                        document.getElementById(id).remove();
+                    },
+                    error: function () {
+                        showAlert('delete_sensor');
+                    },
+                });
+            }
+
+            function showPins(sensorId) {
+                var pins_div = document.getElementById(sensorId + "_pins");
+                var type = document.getElementById(sensorId + "_type").value;
+
+                pins_div.innerHTML = "";
+
+                for (pin in types[type].pins) {
+                    var name = types[type].pins[pin].name;
+                    var pin_new = pin_pattern;
+
+                    pin_new = pin_new.split("%id%").join(sensorId);
+                    pin_new = pin_new.split("%short_name%").join(pin);
+                    pin_new = pin_new.split("%name%").join(name);
+
+                    if (sensors[sensorId] == undefined) {
+                        pin_new = pin_new.split("%value%").join("");
+                        pins_div.innerHTML += pin_new;
+                        continue;
+                    }
+
+                    var pin_value = sensors[sensorId].pins[pin];
+                    if (pin_value != undefined) pin_new = pin_new.split("%value%").join(pin_value);
+                    else pin_new = pin_new.split("%value%").join("");
+
+                    pins_div.innerHTML += pin_new;
+                }
+            }
+        </script>
+        <!-- Loads -->
+        <script type="text/javascript">
+            function setTitle(name) {
+                document.title = name + " · UniWare";
+                document.getElementById("name").innerHTML = name;
+            }
+
+            function showSensors() {
+                var sensors_div = document.getElementById("sensors");
+                for (var id in sensors) {
+                    counter = id;
+
+                    sensors_div.innerHTML += CreateNewCard(counter);
+                    document.getElementById(counter + "_" + sensors[id].type).setAttribute("selected", true);
+
+                    showPins(counter);
+                }
+            }
+
+            function loadTitle() {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/api/device/get");
+                xhr.onload = function () {
+                    if (xhr.status !== 200 && !xhr.responseText) return;
+
+                    var json = JSON.parse(xhr.responseText);
+                    setTitle(json.name);
+                };
+                xhr.onerror = () => showAlert("load_device_error");
+
+                xhr.send();
+            }
+
+            function loadSettings() {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/api/sensors/get");
+                xhr.onload = function () {
+                    if (xhr.status !== 200 && !xhr.responseText) return;
+
+                    var json = JSON.parse(xhr.responseText);
+
+                    sensors = json.sensors;
+                    types = json.types;
+                    showSensors();
+
+                    enable("add");
+                    enable("submit");
+                };
+                xhr.onerror = () => showAlert("load_sensors_error");
+
+                xhr.send();
+            }
+
+            loadTitle();
+            loadSettings();
+        </script>
+        <!-- Send form -->
+        <script type="text/javascript">
+            function save() {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/sensors/set",
+                    data: JSON.stringify($("#form").serializeArray()),
+                    success: function (msg) {
+                        showAlert('form_success');
+                    },
+                    error: function () {
+                        showAlert('form_error');
+                    },
+                });
+            }
+            function reboot() {
+                $.ajax({
+                    type: "POST",
+                    url: "/reboot"
+                });
+				hideAlert('form_success');
+                showAlert('reboot_try');
+            }
+        </script>
+    </body>
+</html>

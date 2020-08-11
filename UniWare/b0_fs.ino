@@ -30,8 +30,12 @@ bool loadSettings() {
   wifi_ssid = json["wifi"]["ssid"].as<String>();
   wifi_psswd = json["wifi"]["psswd"].as<String>();
   ap_psswd = json["wifi"]["passwdAP"].as<String>();
+  // Sensors
+  sensors = json["sensors"].as<String>();
 
-  if (device_name == "") device_name = "UniWare_" + (WiFi.macAddress().substring(0, 5));   
+  if (device_name == "") device_name = "UniWare_" + (WiFi.macAddress().substring(0, 5));
+  if (sensors == "") sensors = "{}";
+     
   return true;
 }
 
@@ -51,6 +55,7 @@ bool saveSettings() {
   JsonObject& json = jsonBuffer.createObject();
   json["device"] = device;
   json["wifi"] = wifi;
+  json["sensors"] = sensors;
   
   File configFile = SPIFFS.open("/settings.json", "w");
   if (!configFile) {

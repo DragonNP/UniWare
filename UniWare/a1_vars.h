@@ -6,6 +6,9 @@ String wifi_psswd;
 // AP WiFi
 String ap_psswd;
 bool   useAP = false;
+// Sensors
+String types;
+String sensors;
 // MQTT
 String mqtt_server;
 int    mqtt_port;

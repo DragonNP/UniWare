@@ -6,7 +6,7 @@ void useAPI() {
 }
 
 void useAPIget() {
-  // GET
+  // Device
   HttpServer.on("/api/device/get", HTTP_GET, [](AsyncWebServerRequest * request) {
     String json = "";
 
@@ -17,7 +17,7 @@ void useAPIget() {
     device.printTo(json);
     request->send(200, "text/plane", json);
   });
-
+  // WiFi
   HttpServer.on("/api/wifi/get", HTTP_GET, [](AsyncWebServerRequest * request) {
     String json = "";
 
@@ -32,10 +32,26 @@ void useAPIget() {
     wifi.printTo(json);
     request->send(200, "text/plane", json);
   });
+  // Sensors
+  HttpServer.on("/api/sensors/get", HTTP_GET, [](AsyncWebServerRequest * request) {
+    String sensors_text = "";
+
+    DynamicJsonBuffer jsonBuffer;
+    JsonObject& sensors_types_json = jsonBuffer.createObject();
+    
+    JsonObject& types_json = jsonBuffer.parseObject(types);
+    JsonObject& sensors_json = jsonBuffer.parseObject(sensors);
+    
+    sensors_types_json["types"] = types_json;
+    sensors_types_json["sensors"] = sensors_json;
+
+    sensors_types_json.printTo(sensors_text);
+    request->send(200, "text/plane", sensors_text);
+  });
 }
 
 void useAPIpost() {
-  // POST
+  // WiFi
   HttpServer.on("/api/wifi/set", HTTP_POST, [](AsyncWebServerRequest * request) {
     Serial.println("API: url:/api/wifi/set, method:post");
     bool saveFlag = false;
@@ -77,7 +93,7 @@ void useAPIpost() {
     if (saveFlag) saveSettings();
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
-
+  // Device
   HttpServer.on("/api/device/set", HTTP_POST, [](AsyncWebServerRequest * request) {
     Serial.println("API: url:/api/device/set, method:post");
     DynamicJsonBuffer jsonBuffer;
@@ -103,10 +119,58 @@ void useAPIpost() {
     if (saveFlag) saveSettings();
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
-
   HttpServer.on("/api/device/reboot", HTTP_POST, [](AsyncWebServerRequest * request) {
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
     delay(2000);
     ESP.restart();
+  });
+  // Sensors
+  HttpServer.on("/api/sensors/set", HTTP_POST, [](AsyncWebServerRequest * request) {
+    Serial.println("API: url:/api/sensors/set, method:post");
+    DynamicJsonBuffer jsonBuffer;
+    JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
+    bool saveFlag = false;
+
+    if (!json.success()) {
+      Serial.println("Failed to parse body");
+      return request->send(503, "text/plane", "{\"status\":\"error\"}");
+    }
+    else {
+      for (int i = 0; i < json.size(); i++) {
+        String name = json[i]["name"].as<const char*>();
+        String value = json[i]["value"].as<const char*>();
+
+        Serial.print(name);
+        Serial.print(" = ");
+        Serial.println(value);
+      }
+    }
+
+    if (saveFlag) saveSettings();
+    request->send(200, "text/plane", "{\"status\":\"ok\"}");
+  });
+  HttpServer.on("/api/sensors/delete", HTTP_POST, [](AsyncWebServerRequest * request) {
+    Serial.println("API: url:/api/sensors/set, method:post");
+    DynamicJsonBuffer jsonBuffer;
+    JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
+    bool saveFlag = false;
+
+    if (!json.success()) {
+      Serial.println("Failed to parse body");
+      return request->send(503, "text/plane", "{\"status\":\"error\"}");
+    }
+    else {
+      for (int i = 0; i < json.size(); i++) {
+        String name = json[i]["name"].as<const char*>();
+        String value = json[i]["value"].as<const char*>();
+
+        Serial.print(name);
+        Serial.print(" = ");
+        Serial.println(value);
+      }
+    }
+
+    if (saveFlag) saveSettings();
+    request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
 }
