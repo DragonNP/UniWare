@@ -7,6 +7,7 @@ void WiFiSetup() {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     WiFi.softAP(device_name, ap_psswd);
+    useAP = true;
     
     // Log
     Serial.print("AP Name: ");
@@ -19,9 +20,11 @@ void WiFiSetup() {
   else {
     // Log
     Serial.print("Connecting to WiFi");
+    
     // WiFi Setting
     WiFi.mode(WIFI_STA);
     WiFi.begin(wifi_ssid, wifi_psswd);
+    useAP = false;
 
     // Wating for connection
     int count = 0;

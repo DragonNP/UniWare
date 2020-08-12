@@ -285,7 +285,7 @@
                 xhr.onload = function () {
                     if (xhr.status === 200 && xhr.responseText) {
                         var json = JSON.parse(xhr.responseText);
-
+						
                         if (json.use == "WiFi") document.getElementById("useWiFi").setAttribute("checked", true);
                         else if (json.use == "AP") document.getElementById("useAP").setAttribute("checked", true);
                         document.getElementById("ssid").value = json.ssid;
