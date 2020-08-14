@@ -1,2 +1,3 @@
 void loop() {
+  WiFiUpdate();
 }

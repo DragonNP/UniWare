@@ -1,53 +1,79 @@
-void WiFiSetup() {
-  bool useCounter = true;
-  
- if (wifi_ssid == "" || useAP) {
-    // Log
-    Serial.println("LOG: Using AP");
-    
-    // WiFi Setting
-    WiFi.mode(WIFI_STA);
-    WiFi.disconnect();
-    WiFi.softAP(device_name, ap_psswd);
-    useAP = true;
-    
-    // Log
-    Serial.print("LOG: AP Name: ");
-    Serial.println(device_name);
-    Serial.print("LOG: Password: ");
-    Serial.println(ap_psswd);
-    Serial.print("LOG: Soft IP Address: ");
-    Serial.println(WiFi.softAPIP());
-  }
-  else {
-    // Log
-    Serial.print("LOG: Connecting to WiFi");
-    
-    // WiFi Setting
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(wifi_ssid, wifi_psswd);
-    useAP = false;
+GTimer wifiConnectTimer;
+bool isConnecting = false;
+bool isAPStarted = false;
+bool isFirstLog = true;
 
-    // Wating for connection
-    int count = 0;
-    while (WiFi.status() != WL_CONNECTED) {
-      if (count == 25) {
-        useAP = true;
-        useCounter = false;
-        count++;
-        WiFiSetup();
-      }
-      
-      delay(500);
-      if (useCounter) Serial.print(".");
-      if (useCounter) count++;
-    }
-    Serial.println(" Connected");
-    
-    // Log
-    Serial.print("SSID: ");
+void WiFiSetup() {
+  wifiConnectTimer.setInterval(1000);
+  if (!useAP) wifiConnectTimer.start();
+
+  wifiTraining();
+  enableAP();
+}
+
+void WiFiUpdate() {
+  if (!wifiConnectTimer.isReady()) return;
+
+  bool isWifiConnected = getWiFiStatus();
+  if (isWifiConnected && isFirstLog) {
+    // WiFi
+    disableAP();
+    // Vars
+    isFirstLog = false;
+    useAP = false;
+    // Logs
+    Serial.println("INFO: Connected to WiFi");
+    Serial.print("INFO: SSID: ");
     Serial.println(wifi_ssid);
-    Serial.print("Local IP Address: ");
+    Serial.print("INFO: Local IP Address: ");
     Serial.println(WiFi.localIP());
   }
-} 
+  else if (!isWifiConnected && !isAPStarted) enableAP();
+  else if (!isWifiConnected && !isConnecting) connectToWiFi();
+}
+
+void wifiTraining() {
+  WiFi.disconnect();
+  WiFi.mode(WIFI_STA);
+}
+
+// AP
+void enableAP() {
+  // Debug
+  DEBUG_PRINTLN("DBUG: Starting AP");
+  // WiFi
+  WiFi.softAP(device_name, ap_psswd);
+  // Vars
+  isAPStarted = true;
+  // Logs
+  Serial.print("INFO: AP Name: ");
+  Serial.println(device_name);
+  Serial.print("INFO: Password: ");
+  Serial.println(ap_psswd);
+  Serial.print("INFO: Soft IP Address: ");
+  Serial.println(WiFi.softAPIP());
+}
+
+void disableAP() {
+  // Debug
+  DEBUG_PRINTLN("DBUG: Disabling AP mode");
+  // WiFi
+  WiFi.softAPdisconnect(true);
+  // Var
+  isAPStarted = false;
+}
+
+// WiFi
+void connectToWiFi() {
+  // Log
+  DEBUG_PRINTLN("DBUG: Connecting to WiFi");
+
+  // WiFi Setting
+  WiFi.begin(wifi_ssid, wifi_psswd);
+
+  isConnecting = true;
+}
+
+bool getWiFiStatus() {
+  return WiFi.status() == WL_CONNECTED;
+}
