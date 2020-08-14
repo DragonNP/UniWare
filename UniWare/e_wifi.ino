@@ -1,7 +1,9 @@
 void WiFiSetup() {
- if (wifi_ssid == "" || wifi_psswd == "" || useAP) {
+  bool useCounter = true;
+  
+ if (wifi_ssid == "" || useAP) {
     // Log
-    Serial.println("Using AP");
+    Serial.println("LOG: Using AP");
     
     // WiFi Setting
     WiFi.mode(WIFI_STA);
@@ -10,16 +12,16 @@ void WiFiSetup() {
     useAP = true;
     
     // Log
-    Serial.print("AP Name: ");
+    Serial.print("LOG: AP Name: ");
     Serial.println(device_name);
-    Serial.print("Password: ");
+    Serial.print("LOG: Password: ");
     Serial.println(ap_psswd);
-    Serial.print("Soft IP Address: ");
+    Serial.print("LOG: Soft IP Address: ");
     Serial.println(WiFi.softAPIP());
   }
   else {
     // Log
-    Serial.print("Connecting to WiFi");
+    Serial.print("LOG: Connecting to WiFi");
     
     // WiFi Setting
     WiFi.mode(WIFI_STA);
@@ -29,17 +31,16 @@ void WiFiSetup() {
     // Wating for connection
     int count = 0;
     while (WiFi.status() != WL_CONNECTED) {
-      if (count >= 120) {
-        Serial.println(" password or SSID is uncorrect, reset");
-        delay(1000);
+      if (count == 25) {
         useAP = true;
-        saveSettings();
-        ESP.reset();
+        useCounter = false;
+        count++;
+        WiFiSetup();
       }
       
       delay(500);
-      Serial.print(".");
-      count++;
+      if (useCounter) Serial.print(".");
+      if (useCounter) count++;
     }
     Serial.println(" Connected");
     

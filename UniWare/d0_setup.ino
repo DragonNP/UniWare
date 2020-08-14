@@ -3,7 +3,7 @@ void setup() {
   Serial.println();
 
   if (!SPIFFS.begin()) {
-    Serial.println("An Error has occurred while mounting SPIFFS");
+    Serial.println("ERROR: An Error has occurred while mounting SPIFFS");
     return;
   }
 

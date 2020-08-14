@@ -1,5 +1,5 @@
 void useAPI() {
-  Serial.println("Using API");
+  DEBUG_PRINTLN("Using API");
   
   useAPIget();
   useAPIpost();
@@ -8,6 +8,8 @@ void useAPI() {
 void useAPIget() {
   // Device
   HttpServer.on("/api/device/get", HTTP_GET, [](AsyncWebServerRequest * request) {
+    DEBUG_PRINTLN("DEUBG: API: url:/api/device/get, method:get");
+    
     String json = "";
 
     StaticJsonBuffer<200> jsonBuffer;
@@ -19,6 +21,8 @@ void useAPIget() {
   });
   // WiFi
   HttpServer.on("/api/wifi/get", HTTP_GET, [](AsyncWebServerRequest * request) {
+    DEBUG_PRINTLN("DEUBG: API: url:/api/wifi/get, method:get");
+    
     String json = "";
 
     StaticJsonBuffer<200> jsonBuffer;
@@ -34,6 +38,8 @@ void useAPIget() {
   });
   // Sensors
   HttpServer.on("/api/sensors/get", HTTP_GET, [](AsyncWebServerRequest * request) {
+    DEBUG_PRINTLN("DEUBG: API: url:/api/sensors/get, method:get");
+    
     String sensors_text = "";
 
     DynamicJsonBuffer jsonBuffer;
@@ -53,7 +59,7 @@ void useAPIget() {
 void useAPIpost() {
   // WiFi
   HttpServer.on("/api/wifi/set", HTTP_POST, [](AsyncWebServerRequest * request) {
-    Serial.println("API: url:/api/wifi/set, method:post");
+    DEBUG_PRINTLN("DEUBG: API: url:/api/wifi/set, method:post");
     bool saveFlag = false;
 
     // Parsing body
@@ -95,7 +101,8 @@ void useAPIpost() {
   });
   // Device
   HttpServer.on("/api/device/set", HTTP_POST, [](AsyncWebServerRequest * request) {
-    Serial.println("API: url:/api/device/set, method:post");
+   DEBUG_PRINTLN("DEUBG: API: url:/api/device/set, method:post");
+    
     DynamicJsonBuffer jsonBuffer;
     JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;
@@ -120,13 +127,16 @@ void useAPIpost() {
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
   HttpServer.on("/api/device/reboot", HTTP_POST, [](AsyncWebServerRequest * request) {
+   DEBUG_PRINTLN("DEUBG: API: url:/api/device/reboot, method:post");
+    
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
     delay(2000);
     ESP.restart();
   });
   // Sensors
   HttpServer.on("/api/sensors/set", HTTP_POST, [](AsyncWebServerRequest * request) {
-    Serial.println("API: url:/api/sensors/set, method:post");
+    DEBUG_PRINTLN("DEUBG: API: url:/api/sensors/set, method:post");
+    
     DynamicJsonBuffer jsonBuffer;
     JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;
@@ -150,7 +160,8 @@ void useAPIpost() {
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
   HttpServer.on("/api/sensors/delete", HTTP_POST, [](AsyncWebServerRequest * request) {
-    Serial.println("API: url:/api/sensors/set, method:post");
+    DEBUG_PRINTLN("DEUBG: API: url:/api/sensors/delete, method:post");
+    
     DynamicJsonBuffer jsonBuffer;
     JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;

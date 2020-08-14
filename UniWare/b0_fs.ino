@@ -1,4 +1,5 @@
 bool loadSettings() {
+  DEBUG_PRINTLN("DEBUG: opening /settings.json");
   File configFile = SPIFFS.open("/settings.json", "r");
   if (!configFile) {
     Serial.println("Failed to open config file");
@@ -22,6 +23,7 @@ bool loadSettings() {
     return false;
   }
 
+  DEBUG_PRINTLN("DEBUG: loads variables");
   // Device
   device_name = json["device"]["name"].as<String>();
   // WiFi
@@ -40,6 +42,7 @@ bool loadSettings() {
 }
 
 bool saveSettings() {
+  DEBUG_PRINTLN("DEBUG: saving settings to /settings.json");
   DynamicJsonBuffer jsonBuffer;
   
   JsonObject& device = jsonBuffer.createObject();
