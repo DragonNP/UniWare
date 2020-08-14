@@ -12,6 +12,8 @@ UniWare is a universal firmware for ESP-8266.
 - [ ] BME280
 - [ ] Soil Moisture
 - [ ] Button
+#### Fix:
+- [ ] Sensors page
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
