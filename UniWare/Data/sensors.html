@@ -262,7 +262,7 @@
                 $.ajax({
                     type: "POST",
                     url: "/api/sensors/delete",
-                    data: '{"id":"%id%"}'.replace("%id%", id),
+                    data: '[{"name": "id", "value": "%id%"}]'.replace("%id%", id),
                     success: function (msg) {
                         document.getElementById(id).remove();
                     },

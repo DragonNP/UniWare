@@ -171,6 +171,8 @@ void useAPIpost() {
           
           pins[short_name] = value;
           sensor_json["pins"] = pins;
+          
+          saveFlag = true;
         }
         
         sensors_json[id] = sensor_json;
@@ -195,16 +197,22 @@ void useAPIpost() {
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
     else {
+      JsonObject& sensors_json = jsonBuffer.parseObject(sensors);
+      
       for (int i = 0; i < json.size(); i++) {
         String name = json[i]["name"].as<const char*>();
         String value = json[i]["value"].as<const char*>();
 
-        Serial.print(name);
-        Serial.print(" = ");
-        Serial.println(value);
+        if (name == "id") {
+          sensors_json.remove(value);
+          saveFlag = true;
+        }
       }
+      
+      sensors = "";
+      sensors_json.printTo(sensors);
     }
-
+    
     if (saveFlag) saveSettings();
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
