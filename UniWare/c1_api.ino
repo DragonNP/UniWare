@@ -1,6 +1,6 @@
 void useAPI() {
   DEBUG_PRINTLN("INFO: Using API");
-  
+
   useAPIget();
   useAPIpost();
 }
@@ -9,7 +9,7 @@ void useAPIget() {
   // Device
   HttpServer.on("/api/device/get", HTTP_GET, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/device/get, method:get");
-    
+
     String json = "";
 
     StaticJsonBuffer<200> jsonBuffer;
@@ -22,7 +22,7 @@ void useAPIget() {
   // WiFi
   HttpServer.on("/api/wifi/get", HTTP_GET, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/wifi/get, method:get");
-    
+
     String json = "";
 
     StaticJsonBuffer<200> jsonBuffer;
@@ -39,15 +39,15 @@ void useAPIget() {
   // Sensors
   HttpServer.on("/api/sensors/get", HTTP_GET, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/sensors/get, method:get");
-    
+
     String sensors_text = "";
 
     DynamicJsonBuffer jsonBuffer;
     JsonObject& sensors_types_json = jsonBuffer.createObject();
-    
+
     JsonObject& types_json = jsonBuffer.parseObject(types);
     JsonObject& sensors_json = jsonBuffer.parseObject(sensors);
-    
+
     sensors_types_json["types"] = types_json;
     sensors_types_json["sensors"] = sensors_json;
 
@@ -101,8 +101,8 @@ void useAPIpost() {
   });
   // Device
   HttpServer.on("/api/device/set", HTTP_POST, [](AsyncWebServerRequest * request) {
-   DEBUG_PRINTLN("DBUG: API: url:/api/device/set, method:post");
-    
+    DEBUG_PRINTLN("DBUG: API: url:/api/device/set, method:post");
+
     DynamicJsonBuffer jsonBuffer;
     JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;
@@ -127,8 +127,8 @@ void useAPIpost() {
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
   HttpServer.on("/api/device/reboot", HTTP_POST, [](AsyncWebServerRequest * request) {
-   DEBUG_PRINTLN("DBUG: API: url:/api/device/reboot, method:post");
-    
+    DEBUG_PRINTLN("DBUG: API: url:/api/device/reboot, method:post");
+
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
     delay(2000);
     ESP.restart();
@@ -136,7 +136,7 @@ void useAPIpost() {
   // Sensors
   HttpServer.on("/api/sensors/set", HTTP_POST, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/sensors/set, method:post");
-    
+
     DynamicJsonBuffer jsonBuffer;
     JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;
@@ -146,14 +146,38 @@ void useAPIpost() {
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
     else {
+      JsonObject& sensors_json = jsonBuffer.parseObject(sensors);
+      
       for (int i = 0; i < json.size(); i++) {
         String name = json[i]["name"].as<const char*>();
         String value = json[i]["value"].as<const char*>();
+        String id = name.substring(0, 5);
 
-        Serial.print(name);
-        Serial.print(" = ");
-        Serial.println(value);
+        String sensor = sensors_json[id].as<String>();
+        if (sensor == "") sensor = "{}";
+        
+        JsonObject& sensor_json = jsonBuffer.parseObject(sensor);
+        
+        if (name.indexOf("_type") == 5) {
+          sensor_json["type"] = value;
+          saveFlag = true;
+        }
+        else if (name.indexOf("_pin_") == 5) {
+          String pins_string = sensor_json["pins"].as<String>();
+          if (pins_string == "") pins_string = "{}";
+          String short_name = name.substring(10);
+          
+          JsonObject& pins = jsonBuffer.parseObject(pins_string);
+          
+          pins[short_name] = value;
+          sensor_json["pins"] = pins;
+        }
+        
+        sensors_json[id] = sensor_json;
       }
+      
+      sensors = "";
+      sensors_json.printTo(sensors);
     }
 
     if (saveFlag) saveSettings();
@@ -161,7 +185,7 @@ void useAPIpost() {
   });
   HttpServer.on("/api/sensors/delete", HTTP_POST, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/sensors/delete, method:post");
-    
+
     DynamicJsonBuffer jsonBuffer;
     JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;

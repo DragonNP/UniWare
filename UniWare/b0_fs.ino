@@ -28,7 +28,7 @@ bool loadSettings() {
   device_name = json["device"]["name"].as<String>();
   // WiFi
   if (json["wifi"]["use"].as<String>() == "WiFi") useAP = false;
-  else if (json["wifi"]["use"].as<String>() == "AP") useAP = true;
+  else useAP = true;
   wifi_ssid = json["wifi"]["ssid"].as<String>();
   wifi_psswd = json["wifi"]["psswd"].as<String>();
   ap_psswd = json["wifi"]["passwdAP"].as<String>();
@@ -38,7 +38,7 @@ bool loadSettings() {
   uint8_t macAddr[6];
   WiFi.macAddress(macAddr);
   
-  if (device_name == "") device_name = "UniWare " + String((char *)macAddr[4]) + ":" + String((char *)macAddr[5]);
+  if (device_name == "") device_name = "UniWare_" + WiFi.macAddress().substring(0, 3) + WiFi.macAddress().substring(15);
   if (sensors == "") sensors = "{}";
      
   return true;
