@@ -2,7 +2,7 @@
 Adafruit_BME280 bme;
 
 void setSensorsTypes() {
-  DEBUG_PRINTLN("DEBUG: setting sensors type");
+  DEBUG_PRINTLN("DBUG: setting sensors type");
 
   DynamicJsonBuffer jsonBuffer;
   JsonObject& types_json = jsonBuffer.createObject();

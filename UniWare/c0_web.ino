@@ -2,7 +2,7 @@
 AsyncWebServer HttpServer(80);
 
 void useCSS() {
-  DEBUG_PRINTLN("DEBUG: Using CSS");
+  DEBUG_PRINTLN("DBUG: Using CSS");
 
   HttpServer.serveStatic("css/dashboard.min.css", SPIFFS, "/dashboard.min.css");
   HttpServer.serveStatic("favicons/favicon.png", SPIFFS, "/favicon.png");
@@ -16,7 +16,7 @@ void useCSS() {
 }
 
 void useJS() {
-  DEBUG_PRINTLN("DEBUG: Using JS");
+  DEBUG_PRINTLN("DBUG: Using JS");
 
   HttpServer.on("/js/bootstrap.min.js", HTTP_GET, [](AsyncWebServerRequest * request) {
     if (useAP)
@@ -33,34 +33,34 @@ void useJS() {
 }
 
 void usePages() {
-  DEBUG_PRINTLN("DEBUG: Using custom pages");
+  DEBUG_PRINTLN("DBUG: Using custom pages");
 
   HttpServer.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
-    Serial.println("LOG: WEB: url:/, method:get");
+    Serial.println("INFO: WEB: url:/, method:get");
     
     request->redirect("/device");
   });
   // Device
   HttpServer.on("/device", HTTP_GET, [](AsyncWebServerRequest * request) {
-    Serial.println("LOG: WEB: url:/device, method:get");
+    Serial.println("INFO: WEB: url:/device, method:get");
     
     request->send(SPIFFS, "/device.html", "text/html");
   });
   // Sensors
   HttpServer.on("/sensors", HTTP_GET, [](AsyncWebServerRequest * request) {
-    Serial.println("LOG: WEB: url:/sensors, method:get");
+    Serial.println("INFO: WEB: url:/sensors, method:get");
     
     request->send(SPIFFS, "/sensors.html", "text/html");
   });
   // WiFi
   HttpServer.on("/wifi", HTTP_GET, [](AsyncWebServerRequest * request) {
-    Serial.println("LOG: WEB: url:/wifi, method:get");
+    Serial.println("INFO: WEB: url:/wifi, method:get");
     
     request->send(SPIFFS, "/wifi.html", "text/html");
   });
   // MQTT
   HttpServer.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest * request) {
-    Serial.println("LOG: WEB: url:/mqtt, method:get");
+    Serial.println("INFO: WEB: url:/mqtt, method:get");
     
     request->send(SPIFFS, "/mqtt.html", "text/html");
   });
@@ -73,5 +73,5 @@ void WebStart() {
   useAPI();
 
   HttpServer.begin();
-  Serial.println("LOG: HTTP HttpServer started");
+  Serial.println("INFO: HTTP HttpServer started");
 }
