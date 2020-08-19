@@ -224,9 +224,9 @@
         <script type="text/javascript">
             const type_pattern = '<option id="%id%_%short_name%" value="%short_name%">%name%</option>';
             const pin_pattern =
-                '<div class="form-group input-group"><div class="input-group-prepend"><div class="input-group-text">%name%</div></div><input type="number" class="form-control" id="%id%_pin_%short_name%" name="%id%_pin_%short_name%" placeholder="%name% Pin" value="%value%" /></div>';
+                '<div class="form-group input-group"><div class="input-group-prepend"><div class="input-group-text">%name%</div></div><input type="text" class="form-control" id="%id%_pin_%short_name%" name="%id%_pin_%short_name%" placeholder="%name% Pin" value="%value%" /></div>';
             const default_sensor =
-                '<div class="sensor pb-3" id="%id%"><div class="card"><div class="card-header"><h5 class="card-title">Sensor</h5><div class="pl-3 pr-3 form-group row"><select class="form-control" name="%id%_type" id="%id%_type" onclick="showPins(\'%id%\')">%types%</select></div></div><div class="card-body"><h6 class="card-title">Pins</h6><div id="%id%_pins"></div><!-- Delete Sensor --><button type="button" class="btn btn-danger" id="%id%_delete" onclick="Delete(\'%id%\')"><svg width="1.3em" height="1.3em" viewBox="0 0 16 16" class="bi bi-dash-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4 7.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1H4z"/></svg></button></div></div>';
+                '<div class="sensor pb-3" id="%id%"><div class="card"><div class="card-header"><h5 class="card-title">Sensor</h5><div class="pl-3 pr-3 form-group row"><select class="form-control" name="%id%_type" id="%id%_type" onclick="showPins(\'%id%\')">%types%</select></div></div><div class="card-body"><h6 class="card-title">Pins (ex.: D1, A0 etc)</h6><div id="%id%_pins"></div><!-- Delete Sensor --><button type="button" class="btn btn-danger" id="%id%_delete" onclick="Delete(\'%id%\')"><svg width="1.3em" height="1.3em" viewBox="0 0 16 16" class="bi bi-dash-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4 7.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1H4z"/></svg></button></div></div>';
 
             var sensors = {};
             var types = {};

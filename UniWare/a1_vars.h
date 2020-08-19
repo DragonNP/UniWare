@@ -9,6 +9,8 @@ bool   useAP = false;
 // Sensors
 String types;
 String sensors;
+String values;
+String pins;
 // MQTT
 String mqtt_server;
 int    mqtt_port;

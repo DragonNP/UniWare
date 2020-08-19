@@ -7,8 +7,10 @@ void setup() {
     return;
   }
 
-  setSensorsTypes();
+  loadPins();
   loadSettings();
+  loadSensorsTypes();
+  loadSensors();
   WebStart();
   WiFiSetup();
 }

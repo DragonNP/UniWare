@@ -1,3 +1,4 @@
 void loop() {
   WiFiUpdate();
+  SensorsUpdate();
 }
