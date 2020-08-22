@@ -11,6 +11,7 @@ void setup() {
   loadSettings();
   loadSensorsTypes();
   loadSensors();
+  MQTTStart();
   WebStart();
   WiFiSetup();
 }

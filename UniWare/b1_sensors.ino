@@ -50,24 +50,36 @@ void loadSensorsTypes() {
   JsonObject& btn_json = jsonBuffer.createObject();
   JsonObject& btn_pins_json = jsonBuffer.createObject();
   JsonObject& btn_pin1_json = jsonBuffer.createObject();
+  JsonObject& btn_topics_json = jsonBuffer.createObject();
+  JsonObject& btn_topic1_json = jsonBuffer.createObject();
   // Pins
   btn_pin1_json["name"] = "Logic";
   btn_pins_json["logic"] = btn_pin1_json;
-  // Button name and pins
+  // Topics
+  btn_topic1_json["name"] = "Logic";
+  btn_topics_json["logic"] = btn_topic1_json;
+  // Button name and pins, topics
   btn_json["name"] = "Button (0/1 values)";
   btn_json["pins"] = btn_pins_json;
+  btn_json["topics"] = btn_topics_json;
 
   // Analog
   String analog_short_name = "analog";
   JsonObject& analog_json = jsonBuffer.createObject();
   JsonObject& analog_pins_json = jsonBuffer.createObject();
   JsonObject& analog_pin1_json = jsonBuffer.createObject();
+  JsonObject& analog_topics_json = jsonBuffer.createObject();
+  JsonObject& analog_topic1_json = jsonBuffer.createObject();
   // Pins
   analog_pin1_json["name"] = "Analog";
   analog_pins_json["analog"] = analog_pin1_json;
+  // Topics
+  analog_topic1_json["name"] = "Analog";
+  analog_topics_json["analog"] = analog_topic1_json;
   // Analog name and pins
   analog_json["name"] = "Analog (from 0 to 1024 values)";
   analog_json["pins"] = analog_pins_json;
+  analog_json["topics"] = analog_topics_json;
 
   // Types
   types_json[btn_short_name] = btn_json;
