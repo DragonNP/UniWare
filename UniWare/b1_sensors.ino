@@ -33,7 +33,7 @@ void loadPins() {
   root["RX"] = 3;
   root["TX"] = 1;
   root["S3"] = 10;
-  
+
   // Save
   root.printTo(pins);
 }
@@ -111,15 +111,32 @@ void SensorsUpdate() {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(sensors);
   JsonObject& root_values = jsonBuffer.parseObject(values);
+  JsonObject& root_types = jsonBuffer.parseObject(types);
+
   // Logic
   for (auto kv : root) {
     if (kv.value["type"] == "button") {
-      int value = buttonRead(kv.value);
-      root_values[kv.key] = value;
+      String type = root[kv.key]["type"].as<String>();
+      JsonObject& json = jsonBuffer.createObject();
+      JsonObject& types_json = jsonBuffer.parseObject(root_types[type]["topics"].as<String>());
+
+      for (auto kv_topic : types_json) {
+        int value = buttonRead(kv.value);
+        json[kv_topic.key] = String(value);
+        root_values[kv.key] = json;
+      }
     }
-    else if (kv.value["type"] == "analog") { 
-      int value = analogSensRead(kv.value);
-      root_values[kv.key] = value;
+    else if (kv.value["type"] == "analog") {
+      String type = kv.value["type"];
+
+      JsonObject& json = jsonBuffer.createObject();
+      JsonObject& types_json = jsonBuffer.parseObject(root_types[type]["topics"].as<String>());
+
+      for (auto kv_topic : types_json) {
+        int value = analogSensRead(kv.value);
+        json[kv_topic.key] = String(value);
+        root_values[kv.key] = json;
+      }
     }
   }
   // Save
@@ -131,21 +148,21 @@ void SensorsUpdate() {
 void buttonInit(JsonObject& sensor) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& pins_json = jsonBuffer.parseObject(pins);
-  
+
   String pin_name = sensor["pins"]["logic"].as<String>();
   int pin = pins_json[pin_name].as<int>();
-  
+
   pinMode(pin, INPUT);
 }
 
 int buttonRead(JsonObject& sensor) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& pins_json = jsonBuffer.parseObject(pins);
-  
+
   String pin_name = sensor["pins"]["logic"].as<String>();
   int pin = pins_json[pin_name].as<int>();
   bool value = digitalRead(pin);
-  
+
   return int(value);
 }
 
@@ -153,7 +170,7 @@ int buttonRead(JsonObject& sensor) {
 void analogInit(JsonObject& sensor) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& pins_json = jsonBuffer.parseObject(pins);
-  
+
   String pin_name = sensor["pins"]["analog"].as<String>();
   int pin = pins_json[pin_name].as<int>();
   pinMode(pin, INPUT);
@@ -162,10 +179,10 @@ void analogInit(JsonObject& sensor) {
 int analogSensRead(JsonObject& sensor) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& pins_json = jsonBuffer.parseObject(pins);
-  
+
   String pin_name = sensor["pins"]["analog"].as<String>();
   int pin = pins_json[pin_name].as<int>();
   int value = analogRead(pin);
-  
+
   return value;
 }
