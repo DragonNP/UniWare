@@ -7,10 +7,13 @@ void setup() {
     return;
   }
 
+  // Load
   loadPins();
   loadSettings();
   loadSensorsTypes();
   loadSensors();
+
+  // Start services
   MQTTSetup();
   WebStart();
   WiFiSetup();

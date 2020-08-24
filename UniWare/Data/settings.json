@@ -1,2 +1,7 @@
 {
+	"wifi": {
+		"use": "WiFi",
+		"ssid": "Home 2.4G",
+		"psswd": "MguxdeMb"
+	}
 }

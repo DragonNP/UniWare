@@ -173,6 +173,8 @@
         </div>
 		<script src="js/jquery.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
+		<script src="js/formToJson.js"></script>
+		<script src="js/formToJson.min.js"></script>
         <!-- Utilities -->
         <script type="text/javascript">
             function showAlert(id) {
@@ -212,7 +214,7 @@
 				$.ajax({
 					type: "POST",
 					url: "/api/device/set",
-					data: JSON.stringify($("#device_form").serializeArray()),
+					data: JSON.stringify($("#device_form").formToJson()),
 					success: function(msg){
 						showAlert('form_success');
 					},

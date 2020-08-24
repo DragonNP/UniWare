@@ -29,7 +29,7 @@ void WiFiUpdate() {
     Serial.println(WiFi.localIP());
   }
   else if (!isWifiConnected && !isAPStarted) enableAP();
-  else if (!isWifiConnected && !isConnecting) connectToWiFi();
+  else if (!isWifiConnected && !isConnecting && !useAP) connectToWiFi();
 }
 
 void wifiTraining() {

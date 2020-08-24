@@ -44,8 +44,6 @@ void MQTTUpdate() {
     MQTTConnect();
   }
   else if (client.connected() && mqttPublishTimer.isReady()) {
-    DEBUG_PRINTLN("DBUG: Sending values to mqtt broker");
-
     client.loop();
 
     MQTTSend();
@@ -53,30 +51,45 @@ void MQTTUpdate() {
 }
 
 void MQTTSend() {
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& root = jsonBuffer.parseObject(sensors);
+  DEBUG_PRINTLN("DBUG: Sending values to mqtt broker");
 
-  for (auto kv_sensor : root) {
-    JsonObject& topics = jsonBuffer.parseObject(root[kv_sensor.key]["mqtt"].as<String>());
+  unsigned int length_sensors = sizeof(sensors);
 
-    for (auto kv : topics) {
-      String type;
-      String topic;
-      bool use = false;
+  DynamicJsonDocument doc_sensors(length_sensors + 500);
+  deserializeJson(doc_sensors, sensors);
 
-      JsonObject& vars = jsonBuffer.parseObject(kv.value.as<String>());
-      JsonObject& root_values = jsonBuffer.parseObject(values);
-      
-      for (auto var : vars) {
-        type = var.key;
-        topic = var.value["topic"].as<String>();
-        
-        if (var.value["use"].as<String>() == "true") use = true;
-      }
-      
-      if (use && (topic != "" && topic != " ")) {
-        String value = root_values[kv_sensor.key][type].as<String>();
-        client.publish(topic, String(value));
+  JsonObject root_sensors = doc_sensors.as<JsonObject>();
+
+  for (JsonPair kv_sensor : root_sensors) {
+    DynamicJsonDocument value_sensor = kv_sensor.value();
+    String key_sensor = kv_sensor.key().c_str();
+
+    DynamicJsonDocument doc_topics = value_sensor["mqtt"];
+    JsonObject root_topics = doc_topics.as<JsonObject>();
+
+    for (JsonPair kv_topics : root_topics) {
+      unsigned int length_values = sizeof(values);
+      DynamicJsonDocument doc_vars = kv_topics.value();
+      DynamicJsonDocument doc_values(length_values + 500);
+
+      deserializeJson(doc_values, values);
+
+      JsonObject root_vars = doc_vars.as<JsonObject>();
+
+      for (JsonPair var : root_vars) {
+        String type = var.key().c_str();
+        String topic = var.value()["topic"].as<String>();
+        bool use = false;
+
+        if (var.value()["use"].as<String>() == "true") use = true;
+
+        if (use && (topic != "" && topic != " ")) {
+          String key = kv_sensor.key().c_str();
+
+          String value = doc_values[key][type].as<String>();
+
+          client.publish(topic, value);
+        }
       }
     }
   }

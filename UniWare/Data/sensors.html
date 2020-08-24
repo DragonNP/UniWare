@@ -202,6 +202,8 @@
         </div>
         <script src="js/jquery.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
+		<script src="js/formToJson.js"></script>
+		<script src="js/formToJson.min.js"></script>
         <!-- Utilities -->
         <script type="text/javascript">
             function GenerateID(length) {
@@ -375,7 +377,7 @@
                 $.ajax({
                     type: "POST",
                     url: "/api/sensors/set",
-                    data: JSON.stringify($("#form").serializeArray()),
+                    data: JSON.stringify($("#form").formToJson()),
                     success: function (msg) {
                         showAlert('form_success');
                     },

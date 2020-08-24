@@ -12,69 +12,70 @@ void useAPIget() {
 
     String json = "";
 
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject& device = jsonBuffer.createObject();
-    device["name"] = device_name;
+    DynamicJsonDocument doc_device(1024);
+    doc_device["name"] = device_name;
 
-    device.printTo(json);
+    serializeJson(doc_device, json);
     request->send(200, "text/plane", json);
   });
+
   // WiFi
   HttpServer.on("/api/wifi/get", HTTP_GET, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/wifi/get, method:get");
 
     String json = "";
 
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject& wifi = jsonBuffer.createObject();
-    if (useAP) wifi["use"] = "AP";
-    else wifi["use"] = "WiFi";
-    wifi["ssid"] = wifi_ssid;
-    wifi["passwd"] = wifi_psswd;
-    wifi["passwdAP"] = ap_psswd;
+    DynamicJsonDocument doc_wifi(1024);
 
-    wifi.printTo(json);
+    if (useAP) doc_wifi["use"] = "AP";
+    else doc_wifi["use"] = "WiFi";
+    doc_wifi["ssid"] = wifi_ssid;
+    doc_wifi["passwd"] = wifi_psswd;
+    doc_wifi["passwdAP"] = ap_psswd;
+
+    serializeJson(doc_wifi, json);
     request->send(200, "text/plane", json);
   });
+
   // Sensors
   HttpServer.on("/api/sensors/get", HTTP_GET, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/sensors/get, method:get");
 
-    String sensors_text = "";
+    String json = "";
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& sensors_types_json = jsonBuffer.createObject();
+    DynamicJsonDocument doc_sensors_types(1024);
+    DynamicJsonDocument doc_types(1024);
+    DynamicJsonDocument doc_sensors(1024);
 
-    JsonObject& types_json = jsonBuffer.parseObject(types);
-    JsonObject& sensors_json = jsonBuffer.parseObject(sensors);
+    deserializeJson(doc_types, types);
+    deserializeJson(doc_sensors, sensors);
 
-    sensors_types_json["types"] = types_json;
-    sensors_types_json["sensors"] = sensors_json;
+    doc_sensors_types["types"] = doc_types;
+    doc_sensors_types["sensors"] = doc_sensors;
 
-    sensors_types_json.printTo(sensors_text);
-    request->send(200, "text/plane", sensors_text);
+    serializeJson(doc_sensors_types, json);
+    request->send(200, "text/plane", json);
   });
+
   // MQTT
   HttpServer.on("/api/mqtt/get", HTTP_GET, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/mqtt/get, method:get");
 
     String json = "";
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& root = jsonBuffer.createObject();
+    DynamicJsonDocument doc(1024);
 
-    if (useMQTT) root["use"] = "true";
-    else root["use"] = "false";
-    if (useMQTTAuth) root["useAuth"] = "true";
-    else root["useAuth"] = "false";
-    root["server"] = mqtt_server;
-    root["port"] = String(mqtt_port);
-    root["user"] = mqtt_user;
-    root["passwd"] = mqtt_pass;
-    root["timeout_publish"] = String(mqtt_timeout_publish);
+    if (useMQTT) doc["use"] = "true";
+    else doc["use"] = "false";
+    if (useMQTTAuth) doc["useAuth"] = "true";
+    else doc["useAuth"] = "false";
+    doc["server"] = mqtt_server;
+    doc["port"] = String(mqtt_port);
+    doc["user"] = mqtt_user;
+    doc["passwd"] = mqtt_pass;
+    doc["timeout_publish"] = String(mqtt_timeout_publish);
 
-    root.printTo(json);
-
+    serializeJson(doc, json);
     request->send(200, "text/plane", json);
   });
 }
@@ -83,20 +84,30 @@ void useAPIpost() {
   // WiFi
   HttpServer.on("/api/wifi/set", HTTP_POST, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/wifi/set, method:post");
+
     bool saveFlag = false;
+    String body = request->arg("body");
+    unsigned int length = sizeof(body);
 
-    // Parsing body
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
+    DynamicJsonDocument doc(length + 200);
+    auto error = deserializeJson(doc, body);
 
-    if (!json.success()) {
-      Serial.println("Failed to parse body");
+    if (error) {
+      Serial.print("FAIL: Failed to parse body: ");
+      Serial.print(error.c_str());
+      Serial.print(", capacity: ");
+      Serial.print(doc.capacity());
+      Serial.print(", body: ");
+      Serial.println(body);
+
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
     else {
-      for (int i = 0; i < json.size(); i++) {
-        String name = json[i]["name"].as<const char*>();
-        String value = json[i]["value"].as<const char*>();
+      JsonObject root = doc.as<JsonObject>();
+
+      for (JsonPair kv : root) {
+        String name = kv.key().c_str();
+        String value = kv.value().as<char*>();
 
         // Search names
         if (name == "use") {
@@ -122,22 +133,34 @@ void useAPIpost() {
     if (saveFlag) saveSettings();
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
+
   // Device
   HttpServer.on("/api/device/set", HTTP_POST, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/device/set, method:post");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;
+    String body = request->arg("body");
+    unsigned int length = sizeof(body);
 
-    if (!json.success()) {
-      Serial.println("Failed to parse body");
+    DynamicJsonDocument doc(length + 200);
+    auto error = deserializeJson(doc, body);
+
+    if (error) {
+      Serial.print("FAIL: Failed to parse body: ");
+      Serial.print(error.c_str());
+      Serial.print(", capacity: ");
+      Serial.print(doc.capacity());
+      Serial.print(", body: ");
+      Serial.println(body);
+
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
     else {
-      for (int i = 0; i < json.size(); i++) {
-        String name = json[i]["name"].as<const char*>();
-        String value = json[i]["value"].as<const char*>();
+      JsonObject root = doc.as<JsonObject>();
+
+      for (JsonPair kv : root) {
+        String name = kv.key().c_str();
+        String value = kv.value().as<char*>();
 
         if (name == "name") {
           device_name = value;
@@ -156,83 +179,69 @@ void useAPIpost() {
     delay(2000);
     ESP.restart();
   });
+
   // Sensors
   HttpServer.on("/api/sensors/set", HTTP_POST, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/sensors/set, method:post");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;
+    String body = request->arg("body");
+    unsigned int length = sizeof(body);
 
-    if (!json.success()) {
-      Serial.println("Failed to parse body");
+    DynamicJsonDocument doc(length + 200);
+    auto error = deserializeJson(doc, body);
+
+    if (error) {
+      Serial.print("FAIL: Failed to parse body: ");
+      Serial.print(error.c_str());
+      Serial.print(", capacity: ");
+      Serial.print(doc.capacity());
+      Serial.print(", body: ");
+      Serial.println(body);
+
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
-    else {
-      JsonObject& sensors_json = jsonBuffer.parseObject(sensors);
 
-      for (int i = 0; i < json.size(); i++) {
-        String name = json[i]["name"].as<const char*>();
-        String value = json[i]["value"].as<const char*>();
-        String id = name.substring(0, 5);
+    unsigned int length_sensors = sizeof(sensors);
+    DynamicJsonDocument doc_sensors(length_sensors + 500);
+    deserializeJson(doc_sensors, sensors);
+    JsonObject root = doc.as<JsonObject>();
 
-        String sensor = sensors_json[id].as<String>();
-        if (sensor == "") sensor = "{}";
+    for (JsonPair kv : root) {
+      String name = kv.key().c_str();
+      String value = kv.value().as<char*>();
+      String id = name.substring(0, 5);
 
-        JsonObject& sensor_json = jsonBuffer.parseObject(sensor);
+      if (name.indexOf("_type") == 5) {
+        doc_sensors[id]["type"] = value;
 
-        if (name.indexOf("_type") == 5) {
-          sensor_json["type"] = value;
-          saveFlag = true;
-        }
-        else if (name.indexOf("_pin_") == 5) {
-          String pins_string = sensor_json["pins"].as<String>();
-          if (pins_string == "") pins_string = "{}";
-          String short_name = name.substring(10);
+        saveFlag = true;
+      }
+      else if (name.indexOf("_pin_") == 5) {
+        String short_name = name.substring(10);
 
-          JsonObject& pins = jsonBuffer.parseObject(pins_string);
+        doc_sensors[id]["pins"][short_name] = value;
 
-          pins[short_name] = value;
-          sensor_json["pins"] = pins;
+        saveFlag = true;
+      }
+      else if (name.indexOf("_mqtt_") == 5) {
+        String short_name = name.substring(11);
+        String key = name.substring(11);
 
-          saveFlag = true;
-        }
-        else if (name.indexOf("_mqtt_") == 5) {
-          String mqtt_str = sensor_json["mqtt"].as<String>();
-          String topics_str = sensor_json["mqtt"]["topics"].as<String>();
-          String current_topic_str;
-          String short_name = name.substring(11);
-          String use_or_topic = name.substring(11);
+        short_name.replace("_use", "");
+        short_name.replace("_topic", "");
+        key.replace(short_name, "");
+        key.replace("_", "");
+  
+        doc_sensors[id]["mqtt"]["topics"][short_name][key] = value;
 
-          short_name.replace("_use", "");
-          short_name.replace("_topic", "");
-          use_or_topic.replace(short_name, "");
-          use_or_topic.replace("_", "");
-          current_topic_str = sensor_json["mqtt"]["topics"][short_name].as<String>();
-
-          if (mqtt_str == "") mqtt_str = "{}";
-          if (topics_str == "") topics_str = "{}";
-          if (current_topic_str == "") current_topic_str = "{}";
-          
-          JsonObject& mqtt = jsonBuffer.parseObject(mqtt_str);
-          JsonObject& topics = jsonBuffer.parseObject(topics_str);
-          JsonObject& current_topic = jsonBuffer.parseObject(current_topic_str);
-
-          current_topic[use_or_topic] = value;
-          topics[short_name] = current_topic;
-          mqtt["topics"] = topics;
-          sensor_json["mqtt"] = mqtt;
-
-          saveFlag = true;
-        }
-
-        sensors_json[id] = sensor_json;
+        saveFlag = true;
       }
 
       sensors = "";
-      sensors_json.printTo(sensors);
-      
-      sensors_json.printTo(Serial);
+      serializeJson(doc_sensors, sensors);
+      serializeJson(doc_sensors, Serial);
+      Serial.println();
     }
 
     if (saveFlag) saveSettings();
@@ -241,51 +250,74 @@ void useAPIpost() {
   HttpServer.on("/api/sensors/delete", HTTP_POST, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/sensors/delete, method:post");
 
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
     bool saveFlag = false;
+    String body = request->arg("body");
+    unsigned int length = sizeof(body);
 
-    if (!json.success()) {
-      Serial.println("Failed to parse body");
+    DynamicJsonDocument doc(length + 200);
+    auto error = deserializeJson(doc, body);
+
+    if (error) {
+      Serial.print("FAIL: Failed to parse body: ");
+      Serial.print(error.c_str());
+      Serial.print(", capacity: ");
+      Serial.print(doc.capacity());
+      Serial.print(", body: ");
+      Serial.println(body);
+
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
     else {
-      JsonObject& sensors_json = jsonBuffer.parseObject(sensors);
+      DynamicJsonDocument doc_sensors(1024);
+      deserializeJson(doc_sensors, sensors);
 
-      for (int i = 0; i < json.size(); i++) {
-        String name = json[i]["name"].as<const char*>();
-        String value = json[i]["value"].as<const char*>();
+      JsonObject root_sensors = doc_sensors.as<JsonObject>();
+
+      for (JsonPair kv : root_sensors) {
+        String name = kv.key().c_str();
+        String value = kv.value().as<char*>();
 
         if (name == "id") {
-          sensors_json.remove(value);
+          doc_sensors.remove(value);
           saveFlag = true;
         }
       }
 
       sensors = "";
-      sensors_json.printTo(sensors);
+      serializeJson(doc_sensors, sensors);
     }
 
     if (saveFlag) saveSettings();
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
   });
+
   // MQTT
   HttpServer.on("/api/mqtt/set", HTTP_POST, [](AsyncWebServerRequest * request) {
     DEBUG_PRINTLN("DBUG: API: url:/api/mqtt/set, method:post");
+
     bool saveFlag = false;
+    String body = request->arg("body");
+    unsigned int length = sizeof(body);
 
-    // Parsing body
-    DynamicJsonBuffer jsonBuffer;
-    JsonArray& json = jsonBuffer.parseArray(request->arg("body"));
+    DynamicJsonDocument doc(length + 200);
+    auto error = deserializeJson(doc, body);
 
-    if (!json.success()) {
-      Serial.println("Failed to parse body");
+    if (error) {
+      Serial.print("FAIL: Failed to parse body: ");
+      Serial.print(error.c_str());
+      Serial.print(", capacity: ");
+      Serial.print(doc.capacity());
+      Serial.print(", body: ");
+      Serial.println(body);
+
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
     else {
-      for (int i = 0; i < json.size(); i++) {
-        String name = json[i]["name"].as<const char*>();
-        String value = json[i]["value"].as<const char*>();
+      JsonObject root = doc.as<JsonObject>();
+
+      for (JsonPair kv : root) {
+        String name = kv.key().c_str();
+        String value = kv.value().as<char*>();
 
         // Search names
         if (name == "use") {
