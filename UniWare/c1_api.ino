@@ -1,5 +1,5 @@
 void useAPI() {
-  DEBUG_PRINTLN("INFO: Using API");
+  DEBUG_PRINTLN("DBUG: Using API");
 
   useAPIget();
   useAPIpost();
@@ -275,21 +275,12 @@ void useAPIpost() {
 
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
-
+      
     JsonObject root_body = doc_body.as<JsonObject>();
 
     for (JsonPair kv : root_body) {
       String name = kv.key().c_str();
       String value = kv.value().as<char*>();
-
-      Serial.print("Body: ");
-      Serial.print(body);
-      Serial.print(", Doc: ");
-      serializeJson(doc_body, Serial);
-      Serial.print("Key: ");
-      Serial.print(name);
-      Serial.print(", Value: ");
-      Serial.println(value);
 
       if (name == "id") {
         doc_sensors.remove(value);

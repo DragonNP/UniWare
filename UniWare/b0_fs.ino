@@ -39,7 +39,7 @@ void loadSettings() {
   else useAP = true;
   wifi_ssid = doc["wifi"]["ssid"].as<String>();
   wifi_psswd = doc["wifi"]["psswd"].as<String>();
-  ap_psswd = doc["wifi"]["passwdAP"].as<String>();
+  ap_psswd = doc["wifi"]["psswd_ap"].as<String>();
 
   // Sensors
   sensors = doc["sensors"].as<String>();
@@ -77,7 +77,7 @@ void saveSettings() {
   else doc_wifi["use"] = "WiFi";
   doc_wifi["ssid"] = wifi_ssid;
   doc_wifi["psswd"] = wifi_psswd;
-  doc_wifi["psswdAP"] = ap_psswd;
+  doc_wifi["psswd_ap"] = ap_psswd;
 
   // MQTT
   DynamicJsonDocument doc_mqtt(2048);
