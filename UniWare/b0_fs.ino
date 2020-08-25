@@ -1,26 +1,27 @@
 void loadSettings() {
+  // Debug
   DEBUG_PRINTLN("DBUG: Opening /settings.json");
+
   File configFile = SPIFFS.open("/settings.json", "r");
   if (!configFile) {
-    Serial.println("FAIL: Failed to open config file");
+    logFailedOpen("loadSettings", "/settings.json");
     return;
   }
 
   size_t size = configFile.size();
   if (size > 1024) {
-    Serial.println("FAIL: Config file size is too large");
+    logFileLarge("loadSettings", "/settings.json");
     return;
   }
 
   std::unique_ptr<char[]> buf(new char[size]);
   configFile.readBytes(buf.get(), size);
 
-  DynamicJsonDocument doc(size+500);
+  DynamicJsonDocument doc(size + 500);
   auto error = deserializeJson(doc, buf.get());
 
   if (error) {
-    Serial.print("FAIL: Failed to parse config file: ");
-    Serial.println(error.c_str());
+    logFailedParse("loadSettings", buf.get(), "settings", error.c_str(), doc.capacity());
 
     device_name = "UniWare_" + WiFi.macAddress().substring(0, 3) + WiFi.macAddress().substring(15);
     sensors = "{}";
@@ -91,9 +92,15 @@ void saveSettings() {
   doc_mqtt["timeout_publish"] = String(mqtt_timeout_publish);
 
   // Sensors
-  unsigned int length_sensors = sizeof(device_name);
-  DynamicJsonDocument doc_sensors(length_sensors + 200);
-  deserializeJson(doc_sensors, sensors);
+  if (sensors == "") sensors = "{}";
+  unsigned int length_sensors = sizeof(sensors);
+  DynamicJsonDocument doc_sensors(length_sensors * 100);
+  auto error_sensors = deserializeJson(doc_sensors, sensors);
+  if (error_sensors) {
+    logFailedParse("saveSettings", sensors, "sensors", error_sensors.c_str(), doc_sensors.capacity());
+    return;
+  }
+
 
   // Save other docs to doc root
   doc_root["device"] = doc_device;
@@ -103,7 +110,8 @@ void saveSettings() {
 
   File configFile = SPIFFS.open("/settings.json", "w");
   if (!configFile) {
-    Serial.println("FAIL: Failed to open config file for writing");
+    logFailedOpen("saveSettings", "/settings.json");
+
     return;
   }
 

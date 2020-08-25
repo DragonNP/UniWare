@@ -43,12 +43,27 @@ void useAPIget() {
 
     String json = "";
 
-    DynamicJsonDocument doc_sensors_types(1024);
-    DynamicJsonDocument doc_types(1024);
-    DynamicJsonDocument doc_sensors(1024);
+    if (sensors == "") sensors = "{}";
+    if (types == "") types = "{}";
 
-    deserializeJson(doc_types, types);
-    deserializeJson(doc_sensors, sensors);
+    unsigned int length_sensors = sizeof(sensors);
+    unsigned int length_types = sizeof(types);
+
+    DynamicJsonDocument doc_sensors_types((length_sensors * 100) + (length_types * 100));
+    DynamicJsonDocument doc_sensors(length_sensors * 100);
+    DynamicJsonDocument doc_types(length_types * 100);
+
+    auto error_sensors = deserializeJson(doc_sensors, sensors);
+    auto error_types = deserializeJson(doc_types, types);
+
+    if (error_sensors) {
+      logFailedParse("/api/sensors/get", sensors, "sensors", error_sensors.c_str(), doc_sensors.capacity());
+      return request->send(503, "text/plane", "{\"status\":\"error\"}");
+    }
+    if (error_types) {
+      logFailedParse("/api/sensors/get", types, "types", error_types.c_str(), doc_types.capacity());
+      return request->send(503, "text/plane", "{\"status\":\"error\"}");
+    }
 
     doc_sensors_types["types"] = doc_types;
     doc_sensors_types["sensors"] = doc_sensors;
@@ -87,46 +102,40 @@ void useAPIpost() {
 
     bool saveFlag = false;
     String body = request->arg("body");
-    unsigned int length = sizeof(body);
 
-    DynamicJsonDocument doc(length + 200);
-    auto error = deserializeJson(doc, body);
+    unsigned int length_body = sizeof(body);
+    DynamicJsonDocument doc_body(length_body * 100);
+    auto error_body = deserializeJson(doc_body, body);
 
-    if (error) {
-      Serial.print("FAIL: Failed to parse body: ");
-      Serial.print(error.c_str());
-      Serial.print(", capacity: ");
-      Serial.print(doc.capacity());
-      Serial.print(", body: ");
-      Serial.println(body);
+    if (error_body) {
+      logFailedParse("/api/wifi/set", body, "body", error_body.c_str(), doc_body.capacity());
 
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
-    else {
-      JsonObject root = doc.as<JsonObject>();
 
-      for (JsonPair kv : root) {
-        String name = kv.key().c_str();
-        String value = kv.value().as<char*>();
+    JsonObject root_body = doc_body.as<JsonObject>();
 
-        // Search names
-        if (name == "use") {
-          if (value == "AP") useAP = true;
-          else if (value == "WiFi") useAP = false;
-          saveFlag = true;
-        }
-        else if (name == "ssid") {
-          wifi_ssid = value;
-          saveFlag = true;
-        }
-        else if (name == "psswd") {
-          wifi_psswd = value;
-          saveFlag = true;
-        }
-        else if (name == "psswd_ap") {
-          ap_psswd = value;
-          saveFlag = true;
-        }
+    for (JsonPair kv : root_body) {
+      String name = kv.key().c_str();
+      String value = kv.value().as<char*>();
+
+      // Search names
+      if (name == "use") {
+        if (value == "AP") useAP = true;
+        else if (value == "WiFi") useAP = false;
+        saveFlag = true;
+      }
+      else if (name == "ssid") {
+        wifi_ssid = value;
+        saveFlag = true;
+      }
+      else if (name == "psswd") {
+        wifi_psswd = value;
+        saveFlag = true;
+      }
+      else if (name == "psswd_ap") {
+        ap_psswd = value;
+        saveFlag = true;
       }
     }
 
@@ -140,32 +149,26 @@ void useAPIpost() {
 
     bool saveFlag = false;
     String body = request->arg("body");
-    unsigned int length = sizeof(body);
 
-    DynamicJsonDocument doc(length + 200);
-    auto error = deserializeJson(doc, body);
+    unsigned int length_body = sizeof(body);
+    DynamicJsonDocument doc_body(length_body * 100);
+    auto error_body = deserializeJson(doc_body, body);
 
-    if (error) {
-      Serial.print("FAIL: Failed to parse body: ");
-      Serial.print(error.c_str());
-      Serial.print(", capacity: ");
-      Serial.print(doc.capacity());
-      Serial.print(", body: ");
-      Serial.println(body);
+    if (error_body) {
+      logFailedParse("/api/device/set", body, "body", error_body.c_str(), doc_body.capacity());
 
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
-    else {
-      JsonObject root = doc.as<JsonObject>();
 
-      for (JsonPair kv : root) {
-        String name = kv.key().c_str();
-        String value = kv.value().as<char*>();
+    JsonObject root_body = doc_body.as<JsonObject>();
 
-        if (name == "name") {
-          device_name = value;
-          saveFlag = true;
-        }
+    for (JsonPair kv : root_body) {
+      String name = kv.key().c_str();
+      String value = kv.value().as<char*>();
+
+      if (name == "name") {
+        device_name = value;
+        saveFlag = true;
       }
     }
 
@@ -186,28 +189,30 @@ void useAPIpost() {
 
     bool saveFlag = false;
     String body = request->arg("body");
-    unsigned int length = sizeof(body);
 
-    DynamicJsonDocument doc(length + 200);
-    auto error = deserializeJson(doc, body);
+    unsigned int length_body = sizeof(body);
+    unsigned int length_sensors = sizeof(sensors);
 
-    if (error) {
-      Serial.print("FAIL: Failed to parse body: ");
-      Serial.print(error.c_str());
-      Serial.print(", capacity: ");
-      Serial.print(doc.capacity());
-      Serial.print(", body: ");
-      Serial.println(body);
+    DynamicJsonDocument doc_body(length_body * 100);
+    DynamicJsonDocument doc_sensors(length_sensors * 100);
+
+    auto error_body = deserializeJson(doc_body, body);
+    auto error_sensors = deserializeJson(doc_sensors, sensors);
+
+    if (error_body) {
+      logFailedParse("/api/sensors/set", body, "body", error_body.c_str(), doc_body.capacity());
+
+      return request->send(503, "text/plane", "{\"status\":\"error\"}");
+    }
+    if (error_sensors) {
+      logFailedParse("/api/sensors/set", sensors, "sensors", error_sensors.c_str(), doc_sensors.capacity());
 
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
 
-    unsigned int length_sensors = sizeof(sensors);
-    DynamicJsonDocument doc_sensors(length_sensors + 500);
-    deserializeJson(doc_sensors, sensors);
-    JsonObject root = doc.as<JsonObject>();
+    JsonObject root_body = doc_body.as<JsonObject>();
 
-    for (JsonPair kv : root) {
+    for (JsonPair kv : root_body) {
       String name = kv.key().c_str();
       String value = kv.value().as<char*>();
       String id = name.substring(0, 5);
@@ -232,7 +237,7 @@ void useAPIpost() {
         short_name.replace("_topic", "");
         key.replace(short_name, "");
         key.replace("_", "");
-  
+
         doc_sensors[id]["mqtt"]["topics"][short_name][key] = value;
 
         saveFlag = true;
@@ -240,8 +245,6 @@ void useAPIpost() {
 
       sensors = "";
       serializeJson(doc_sensors, sensors);
-      serializeJson(doc_sensors, Serial);
-      Serial.println();
     }
 
     if (saveFlag) saveSettings();
@@ -252,40 +255,50 @@ void useAPIpost() {
 
     bool saveFlag = false;
     String body = request->arg("body");
-    unsigned int length = sizeof(body);
 
-    DynamicJsonDocument doc(length + 200);
-    auto error = deserializeJson(doc, body);
+    unsigned int length_body = sizeof(body);
+    unsigned int length_sensors = sizeof(sensors);
 
-    if (error) {
-      Serial.print("FAIL: Failed to parse body: ");
-      Serial.print(error.c_str());
-      Serial.print(", capacity: ");
-      Serial.print(doc.capacity());
-      Serial.print(", body: ");
-      Serial.println(body);
+    DynamicJsonDocument doc_body(length_body * 100);
+    DynamicJsonDocument doc_sensors(length_sensors * 100);
+
+    auto error_body = deserializeJson(doc_body, body);
+    auto error_sensors = deserializeJson(doc_sensors, sensors);
+
+    if (error_body) {
+      logFailedParse("/api/sensors/delete", body, "body", error_body.c_str(), doc_body.capacity());
 
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
-    else {
-      DynamicJsonDocument doc_sensors(1024);
-      deserializeJson(doc_sensors, sensors);
+    if (error_sensors) {
+      logFailedParse("/api/sensors/delete", sensors, "sensors", error_sensors.c_str(), doc_sensors.capacity());
 
-      JsonObject root_sensors = doc_sensors.as<JsonObject>();
-
-      for (JsonPair kv : root_sensors) {
-        String name = kv.key().c_str();
-        String value = kv.value().as<char*>();
-
-        if (name == "id") {
-          doc_sensors.remove(value);
-          saveFlag = true;
-        }
-      }
-
-      sensors = "";
-      serializeJson(doc_sensors, sensors);
+      return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
+
+    JsonObject root_body = doc_body.as<JsonObject>();
+
+    for (JsonPair kv : root_body) {
+      String name = kv.key().c_str();
+      String value = kv.value().as<char*>();
+
+      Serial.print("Body: ");
+      Serial.print(body);
+      Serial.print(", Doc: ");
+      serializeJson(doc_body, Serial);
+      Serial.print("Key: ");
+      Serial.print(name);
+      Serial.print(", Value: ");
+      Serial.println(value);
+
+      if (name == "id") {
+        doc_sensors.remove(value);
+        saveFlag = true;
+      }
+    }
+
+    sensors = "";
+    serializeJson(doc_sensors, sensors);
 
     if (saveFlag) saveSettings();
     request->send(200, "text/plane", "{\"status\":\"ok\"}");
@@ -297,59 +310,53 @@ void useAPIpost() {
 
     bool saveFlag = false;
     String body = request->arg("body");
-    unsigned int length = sizeof(body);
 
-    DynamicJsonDocument doc(length + 200);
-    auto error = deserializeJson(doc, body);
+    unsigned int length_body = sizeof(body);
+    DynamicJsonDocument doc_body(length_body * 100);
+    auto error_body = deserializeJson(doc_body, body);
 
-    if (error) {
-      Serial.print("FAIL: Failed to parse body: ");
-      Serial.print(error.c_str());
-      Serial.print(", capacity: ");
-      Serial.print(doc.capacity());
-      Serial.print(", body: ");
-      Serial.println(body);
+    if (error_body) {
+      logFailedParse("/api/mqtt/set", body, "body", error_body.c_str(), doc_body.capacity());
 
       return request->send(503, "text/plane", "{\"status\":\"error\"}");
     }
-    else {
-      JsonObject root = doc.as<JsonObject>();
 
-      for (JsonPair kv : root) {
-        String name = kv.key().c_str();
-        String value = kv.value().as<char*>();
+    JsonObject root_body = doc_body.as<JsonObject>();
 
-        // Search names
-        if (name == "use") {
-          if (value == "true") useMQTT = true;
-          else if (value == "false") useMQTT = false;
-          saveFlag = true;
-        }
-        else if (name == "useAuth") {
-          if (value == "true") useMQTTAuth = true;
-          else if (value == "false") useMQTTAuth = false;
-          saveFlag = true;
-        }
-        else if (name == "server") {
-          mqtt_server = value;
-          saveFlag = true;
-        }
-        else if (name == "port") {
-          mqtt_port = value.toInt();
-          saveFlag = true;
-        }
-        else if (name == "user") {
-          mqtt_user = value;
-          saveFlag = true;
-        }
-        else if (name == "passwd") {
-          mqtt_pass = value;
-          saveFlag = true;
-        }
-        else if (name == "timeout_publish") {
-          mqtt_timeout_publish = value.toInt();
-          saveFlag = true;
-        }
+    for (JsonPair kv : root_body) {
+      String name = kv.key().c_str();
+      String value = kv.value().as<char*>();
+
+      // Search names
+      if (name == "use") {
+        if (value == "true") useMQTT = true;
+        else if (value == "false") useMQTT = false;
+        saveFlag = true;
+      }
+      else if (name == "useAuth") {
+        if (value == "true") useMQTTAuth = true;
+        else if (value == "false") useMQTTAuth = false;
+        saveFlag = true;
+      }
+      else if (name == "server") {
+        mqtt_server = value;
+        saveFlag = true;
+      }
+      else if (name == "port") {
+        mqtt_port = value.toInt();
+        saveFlag = true;
+      }
+      else if (name == "user") {
+        mqtt_user = value;
+        saveFlag = true;
+      }
+      else if (name == "passwd") {
+        mqtt_pass = value;
+        saveFlag = true;
+      }
+      else if (name == "timeout_publish") {
+        mqtt_timeout_publish = value.toInt();
+        saveFlag = true;
       }
     }
 

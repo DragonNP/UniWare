@@ -55,8 +55,13 @@ void MQTTSend() {
 
   unsigned int length_sensors = sizeof(sensors);
 
-  DynamicJsonDocument doc_sensors(length_sensors + 500);
-  deserializeJson(doc_sensors, sensors);
+  DynamicJsonDocument doc_sensors(length_sensors * 100);
+  auto error_sensors = deserializeJson(doc_sensors, sensors);
+
+  if (error_sensors) {
+    logFailedParse("MQTTSend", sensors, "sensors", error_sensors.c_str(), doc_sensors.capacity());
+    return;
+  }
 
   JsonObject root_sensors = doc_sensors.as<JsonObject>();
 
@@ -68,11 +73,16 @@ void MQTTSend() {
     JsonObject root_topics = doc_topics.as<JsonObject>();
 
     for (JsonPair kv_topics : root_topics) {
-      unsigned int length_values = sizeof(values);
       DynamicJsonDocument doc_vars = kv_topics.value();
-      DynamicJsonDocument doc_values(length_values + 500);
 
-      deserializeJson(doc_values, values);
+      unsigned int length_values = sizeof(values);
+      DynamicJsonDocument doc_values(length_values * 100);
+      auto error_values = deserializeJson(doc_values, values);
+
+      if (error_values) {
+        logFailedParse("MQTTSend", values, "values", error_values.c_str(), doc_values.capacity());
+        continue;
+      }
 
       JsonObject root_vars = doc_vars.as<JsonObject>();
 

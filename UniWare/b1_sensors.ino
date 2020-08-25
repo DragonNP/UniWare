@@ -3,14 +3,14 @@ GTimer sensorTimer;
 
 // Functions
 // Button
-void buttonInit(DynamicJsonDocument sensor);
-int buttonRead(DynamicJsonDocument sensor);
+void buttonInit(DynamicJsonDocument doc_sensor);
+int buttonRead(DynamicJsonDocument doc_sensor);
 // Analog
-void analogInit(DynamicJsonDocument sensor);
-int analogSensRead(DynamicJsonDocument sensor);
+void analogInit(DynamicJsonDocument doc_sensor);
+int analogSensRead(DynamicJsonDocument doc_sensor);
 // Analog
-void bme280Init(DynamicJsonDocument sensor);
-float bme280Read(DynamicJsonDocument sensor, String type_value);
+void bme280Init(DynamicJsonDocument doc_sensor);
+float bme280Read(DynamicJsonDocument doc_sensor, String type_value);
 
 void loadPins() {
   // Debug
@@ -87,22 +87,18 @@ void loadSensors() {
   DEBUG_PRINTLN("DBUG: Load sensors");
 
   // Vars
-  DynamicJsonDocument doc(1024);
+  if (sensors == "") sensors = "{}";
+  unsigned int length_sensors = sizeof(sensors);
+  DynamicJsonDocument doc(length_sensors * 100);
   auto error = deserializeJson(doc, sensors);
   JsonObject root = doc.as<JsonObject>();
 
-  // Logic
   if (error) {
-    Serial.print("FAIL: Failed to parse sensors: ");
-    Serial.print(error.c_str());
-    Serial.print(", capacity: ");
-    Serial.print(doc.capacity());
-    Serial.print(", sensors: ");
-    Serial.println(sensors);
-
+    logFailedParse("loadSensors", sensors, "sensors", error.c_str(), doc.capacity());
     return;
   }
 
+  // Logic
   for (JsonPair kv : root) {
     DynamicJsonDocument value = kv.value();
 
@@ -123,20 +119,37 @@ void SensorsUpdate() {
   unsigned int length_values = sizeof(values);
   unsigned int length_types = sizeof(types);
 
-  DynamicJsonDocument doc_sensors(length_sensors + 500);
-  DynamicJsonDocument doc_values(length_values + 500);
-  DynamicJsonDocument doc_types(length_types + 500);
+  DynamicJsonDocument doc_sensors(length_sensors * 100);
+  DynamicJsonDocument doc_values(length_values * 100);
+  DynamicJsonDocument doc_types(length_types * 100);
 
-  deserializeJson(doc_sensors, sensors);
-  deserializeJson(doc_values, values);
-  deserializeJson(doc_types, types);
+  if (sensors == "") sensors = "{}";
+  if (values == "") values = "{}";
+  if (types == "") types = "{}";
+
+  auto error_sensors = deserializeJson(doc_sensors, sensors);
+  auto error_values = deserializeJson(doc_values, values);
+  auto error_types = deserializeJson(doc_types, types);
 
   JsonObject root_sensors = doc_sensors.as<JsonObject>();
 
+  if (error_sensors) {
+    logFailedParse("SensorsUpdate", sensors, "sensors", error_sensors.c_str(), doc_sensors.capacity());
+    return;
+  }
+  if (error_values) {
+    logFailedParse("SensorsUpdate", values, "values", error_values.c_str(), doc_values.capacity());
+    return;
+  }
+  if (error_types) {
+    logFailedParse("SensorsUpdate", types, "types", error_types.c_str(), doc_types.capacity());
+    return;
+  }
+
   // Logic
-  for (JsonPair kv_sensors : root_sensors) {
-    DynamicJsonDocument value_sensors = kv_sensors.value();
-    String key_sensors = kv_sensors.key().c_str();
+  for (JsonPair kv_sensor : root_sensors) {
+    DynamicJsonDocument value_sensors = kv_sensor.value();
+    String key_sensor = kv_sensor.key().c_str();
 
     if (value_sensors["type"] == "button") {
       String type = value_sensors["type"];
@@ -148,10 +161,10 @@ void SensorsUpdate() {
 
       for (JsonPair topic_kv : root_topics) {
         String topic_key = topic_kv.key().c_str();
+        
         int read_value = buttonRead(value_sensors);
 
-        json[topic_key] = String(read_value);
-        doc_values[topic_key] = json;
+        doc_values[key_sensor][topic_key] = String(read_value);
       }
     }
     else if (value_sensors["type"] == "analog") {
@@ -163,13 +176,11 @@ void SensorsUpdate() {
       JsonObject root_topics = doc_topics.as<JsonObject>();
 
       for (JsonPair topic_kv : root_topics) {
-        DynamicJsonDocument topic_value = topic_kv.value();
         String topic_key = topic_kv.key().c_str();
 
-        int read_value = analogSensRead(topic_value);
+        int read_value = analogSensRead(value_sensors);
 
-        json[topic_key] = String(read_value);
-        doc_values[key_sensors] = json;
+        doc_values[key_sensor][topic_key] = String(read_value);
       }
     }
     else if (value_sensors["type"] == "bme280") {
@@ -184,10 +195,9 @@ void SensorsUpdate() {
         DynamicJsonDocument topic_value = topic_kv.value();
         String topic_key = topic_kv.key().c_str();
 
-        float read_value = bme280Read(topic_value, topic_key);
+        float read_value = bme280Read(value_sensors, topic_key);
 
-        json[topic_key] = String(read_value);
-        doc_values[topic_key] = json;
+        doc_values[key_sensor][topic_key] = String(read_value);
       }
     }
   }
@@ -198,74 +208,108 @@ void SensorsUpdate() {
 }
 
 
-void buttonInit(DynamicJsonDocument sensor) {
+void buttonInit(DynamicJsonDocument doc_sensor) {
   unsigned int length_pins = sizeof(pins);
-  DynamicJsonDocument doc_pins(length_pins + 200);
-  deserializeJson(doc_pins, pins);
+  DynamicJsonDocument doc_pins(length_pins * 100);
+  auto error_pins = deserializeJson(doc_pins, pins);
 
-  String pin_name = sensor["pins"]["logic"].as<String>();
+  if (error_pins) {
+    logFailedParse("buttonInit", pins, "pins", error_pins.c_str(), doc_pins.capacity());
+    return;
+  }
+
+  String pin_name = doc_sensor["pins"]["logic"].as<String>();
   int pin = doc_pins[pin_name].as<int>();
 
   pinMode(pin, INPUT);
 }
 
-int buttonRead(DynamicJsonDocument sensor) {
+int buttonRead(DynamicJsonDocument doc_sensor) {
   unsigned int length_pins = sizeof(pins);
-  DynamicJsonDocument doc_pins(length_pins + 200);
-  deserializeJson(doc_pins, pins);
+  DynamicJsonDocument doc_pins(length_pins * 100);
+  auto error_pins = deserializeJson(doc_pins, pins);
 
-  String pin_name = sensor["pins"]["logic"].as<String>();
+  if (error_pins) {
+    logFailedParse("buttonRead", pins, "pins", error_pins.c_str(), doc_pins.capacity());
+    return 0;
+  }
+
+  String pin_name = doc_sensor["pins"]["logic"].as<String>();
   int pin = doc_pins[pin_name].as<int>();
   bool value = digitalRead(pin);
-
+  
   return int(value);
 }
 
 
-void analogInit(DynamicJsonDocument sensor) {
+void analogInit(DynamicJsonDocument doc_sensor) {
   unsigned int length_pins = sizeof(pins);
-  DynamicJsonDocument doc_pins(length_pins + 200);
-  deserializeJson(doc_pins, pins);
+  DynamicJsonDocument doc_pins(length_pins * 100);
+  auto error_pins = deserializeJson(doc_pins, pins);
 
-  String pin_name = sensor["pins"]["analog"].as<String>();
+  if (error_pins) {
+    logFailedParse("analogInit", pins, "pins", error_pins.c_str(), doc_pins.capacity());
+    return;
+  }
+
+  String pin_name = doc_sensor["pins"]["analog"].as<String>();
   int pin = doc_pins[pin_name].as<int>();
   pinMode(pin, INPUT);
 }
 
-int analogSensRead(DynamicJsonDocument sensor) {
+int analogSensRead(DynamicJsonDocument doc_sensor) {
   unsigned int length_pins = sizeof(pins);
-  DynamicJsonDocument doc_pins(length_pins + 200);
-  deserializeJson(doc_pins, pins);
+  DynamicJsonDocument doc_pins(length_pins * 100);
+  auto error_pins = deserializeJson(doc_pins, pins);
 
-  String pin_name = sensor["pins"]["analog"].as<String>();
+  if (error_pins) {
+    logFailedParse("analogSensRead", pins, "pins", error_pins.c_str(), doc_pins.capacity());
+    return 0;
+  }
+
+  String pin_name = doc_sensor["pins"]["analog"].as<String>();
   int pin = doc_pins[pin_name].as<int>();
   int value = analogRead(pin);
-
+  
   return value;
 }
 
 
-void bme280Init(DynamicJsonDocument sensor) {
+void bme280Init(DynamicJsonDocument doc_sensor) {
   unsigned int length_pins = sizeof(pins);
-  DynamicJsonDocument doc_pins(length_pins + 200);
-  deserializeJson(doc_pins, pins);
+
+  DynamicJsonDocument doc_pins(length_pins * 100);
+
+  auto error_pins = deserializeJson(doc_pins, pins);
+
+  if (error_pins) {
+    logFailedParse("bme280Init", pins, "pins", error_pins.c_str(), doc_pins.capacity());
+    return;
+  }
 
   Adafruit_BME280 bme;
 
-  String pin_name = sensor["pins"]["i2c"].as<String>();
+  String pin_name = doc_sensor["pins"]["i2c"].as<String>();
   int pin = doc_pins[pin_name].as<int>();
 
   bme.begin(pin);
 }
 
-float bme280Read(DynamicJsonDocument sensor, String type_value) {
+float bme280Read(DynamicJsonDocument doc_sensor, String type_value) {
   unsigned int length_pins = sizeof(pins);
-  DynamicJsonDocument doc_pins(length_pins + 200);
-  deserializeJson(doc_pins, pins);
+
+  DynamicJsonDocument doc_pins(length_pins * 100);
+
+  auto error_pins = deserializeJson(doc_pins, pins);
+
+  if (error_pins) {
+    logFailedParse("bme280Read", pins, "pins", error_pins.c_str(), doc_pins.capacity());
+    return 0;
+  }
 
   Adafruit_BME280 bme;
 
-  String pin_name = sensor["pins"]["address"].as<String>();
+  String pin_name = doc_sensor["pins"]["address"].as<String>();
   int pin = doc_pins[pin_name].as<int>();
   float value;
 
